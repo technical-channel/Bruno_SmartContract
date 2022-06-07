@@ -213,7 +213,7 @@ contract ICOPrivateSale is Ownable {
 
     uint8  icoTokenDecimals;
     uint8  busdTokenDecimals;
-
+    bool public isVesting;
     address[]  SellTrackAddr; // capture all the addresses who perform trades
     uint256[]  SellTrackAddrAmount; // capture all the addresses amount who perform trades
 
@@ -240,6 +240,7 @@ contract ICOPrivateSale is Ownable {
         require(block.timestamp >= startTime, "Sale not started yet");
         require( _busdAmount > 0, "Amount should be greater from 0");
         require(totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate <= totalTokenSupply,"Don't have sufficent token for transaction");
+        require(!isIcoOver(),"sale is ended");
         // Collect BUSD to ICO Contract Address
         IBEP20(busdTokenContractAddr).transferFrom(msg.sender, address(this), _busdAmount); 
         // set sell track after the transaction
@@ -281,11 +282,18 @@ contract ICOPrivateSale is Ownable {
     // Admin can Change Start Time and End Time for ICO
     function setICOTime(uint256 _startTime, uint256 _endTime) public onlyOwner {
         require(_endTime > _startTime,"Start Time Can not be Greater Than End Time");
+        require(block.timestamp < startTime, "Can't change time once sale started");
         startTime = _startTime / 10**icoTokenDecimals;
         endTime = _endTime / 10**icoTokenDecimals;
     }
 
-    
+     function setICOEndTime( uint256 _endTime) public onlyOwner {
+        require(_endTime > startTime,"Start Time Can not be Greater Than End Time");
+        require(block.timestamp >= startTime, "Sale not started yet");
+        require(!isIcoOver(), "Can't change time once sale ended");
+        endTime = _endTime / 10**icoTokenDecimals;
+    }
+ 
     function showAllTransaction() public view returns (address[] memory, uint256[] memory) {
         require(SellTrackAddr.length > 0, " Transaction data not found");
         return (SellTrackAddr, SellTrackAddrAmount);
@@ -298,7 +306,6 @@ contract ICOPrivateSale is Ownable {
     }
     
 
-  
 
     function isIcoOver() public view returns (bool) {
         if (
@@ -313,10 +320,14 @@ contract ICOPrivateSale is Ownable {
     function Vesting() public onlyOwner returns (bool) {
         /*1. After Sale End*/
         require(isIcoOver(), "Sale is not Ended. Wait for it");
+        require(!isVesting,"vesting already done");
+        require(SellTrackAddr.length>0,"no one invested");
+
         for(uint8 i=0; i<SellTrackAddr.length; i++)
         {
             IBEP20(icoTokenContractAddr).transfer(SellTrackAddr[i],  (SellTrackAddrAmount[i]*10**icoTokenDecimals)/presaleRate);
         }
+        isVesting= true;
         return true;
     }
 
@@ -326,3 +337,7 @@ contract ICOPrivateSale is Ownable {
         return true;
     }
 }
+
+// "000000000000000000"
+// "500000000000000000"
+// "100000000000000000000"
