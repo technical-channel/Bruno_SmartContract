@@ -200,14 +200,14 @@ contract ICOPrivateSale is Ownable {
     using SafeMath for uint256;
     event Print(string msg, uint256 stime, uint256 _etime);
 
-    uint256  presaleRate =2298850600000000 ; // Sell PresaleRate (input PresaleRate should be multiply with 10 to the power decimalsValue)
+    uint256  presaleRate =2298850570000000 ; // Sell PresaleRate (input PresaleRate should be multiply with 10 to the power decimalsValue)
     uint256  startTime; // ICO start time
     uint256  endTime; // ICO End Time
 
     address  icoTokenContractAddr; // SoldOut Token Contract Address
     address  busdTokenContractAddr; // SoldOut Token Contract Address
     uint256  softCap = 1000000000000000000000000; // Soft Cap for the IDO
-    uint256  hardCap = 5000000000000000000000000; 
+    uint256  hardCap = 50000000000000000000000000; 
     uint256  totalTokenNeedForInvestor; // Total Fund
     uint256  TotalCollectedBNBFund;
     uint256  totalTokenSupply = 10000000000000000000000000 ;
@@ -240,7 +240,8 @@ contract ICOPrivateSale is Ownable {
     function buyToken(uint256 _busdAmount) public returns (bool) {
         require(block.timestamp >= startTime, "Sale not started yet");
         require( _busdAmount > 0, "Amount should be greater from 0");
-        require(totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate <= totalTokenSupply,"Don't have sufficent token for transaction");
+        require(totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate<=hardCap,"Hardcap Reached");
+        //require(totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate <= totalTokenSupply,"Don't have sufficent token for transaction");
         require(!isIcoOver(),"sale is ended");
         // Collect BUSD to ICO Contract Address
         IBEP20(busdTokenContractAddr).transferFrom(msg.sender, address(this), _busdAmount); 
@@ -310,7 +311,7 @@ contract ICOPrivateSale is Ownable {
 
     function isIcoOver() public view returns (bool) {
         if (
-            (block.timestamp >= endTime || (totalTokenNeedForInvestor >= totalTokenSupply))
+            (block.timestamp >= endTime || (TotalCollectedBNBFund >= totalTokenSupply))
         ) {
             return true;
         } else {
