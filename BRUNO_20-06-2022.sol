@@ -210,7 +210,7 @@ contract ICOPrivateSale is Ownable {
     uint256  hardCap = 50000000000000000000000000; 
     uint256  totalTokenNeedForInvestor; // Total Fund
     uint256  TotalCollectedBNBFund;
-    uint256  totalTokenSupply = 10000000000000000000000000 ;
+    uint256  totalTokenSupply = 100000000000000000000000000 ;
 
     uint8  icoTokenDecimals;
     uint8  busdTokenDecimals;
