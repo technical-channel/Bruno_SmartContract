@@ -200,7 +200,7 @@ contract ICOPrivateSale is Ownable {
     using SafeMath for uint256;
     event Print(string msg, uint256 stime, uint256 _etime);
 
-    uint256  presaleRate =2298850570000000 ; // Sell PresaleRate (input PresaleRate should be multiply with 10 to the power decimalsValue)
+    uint256  presaleRate =2298850600000000 ; // Sell PresaleRate (input PresaleRate should be multiply with 10 to the power decimalsValue)
     uint256  startTime; // ICO start time
     uint256  endTime; // ICO End Time
 
@@ -240,8 +240,8 @@ contract ICOPrivateSale is Ownable {
     function buyToken(uint256 _busdAmount) public returns (bool) {
         require(block.timestamp >= startTime, "Sale not started yet");
         require( _busdAmount > 0, "Amount should be greater from 0");
-        require(totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate<=hardCap,"Hardcap Reached");
-        //require(totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate <= totalTokenSupply,"Don't have sufficent token for transaction");
+        require(totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate <=hardCap && totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate <=totalTokenSupply,"Hardcap  & token supply");
+        // require(totalTokenNeedForInvestor + (_busdAmount*10**icoTokenDecimals)/presaleRate <= totalTokenSupply,"Don't have sufficent token for transaction");
         require(!isIcoOver(),"sale is ended");
         // Collect BUSD to ICO Contract Address
         IBEP20(busdTokenContractAddr).transferFrom(msg.sender, address(this), _busdAmount); 
@@ -343,3 +343,8 @@ contract ICOPrivateSale is Ownable {
 // "000000000000000000"
 // "500000000000000000"
 // "100000000000000000000"
+// BRUNO TOKEN 0x26656F02F9a4a039502DE51f83A818fe89c0Dbb6
+// busd 0x4D071669663CA0020E54ca1e5D6f77Fdda4f1801
+
+// START TIME 1655707810
+// END 1655789874
